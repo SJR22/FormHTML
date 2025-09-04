@@ -38,15 +38,26 @@
 <script>
   const tg = window.Telegram.WebApp;
   tg.expand();
-
+  tg.enableClosingConfirmation();
   document.getElementById("proxyForm").addEventListener("submit", function(e) {
     e.preventDefault();
-    const data = {};
-    new FormData(this).forEach((value, key) => data[key] = value);
-    tg.sendData(JSON.stringify(data));
-    setTimeout(() => tg.close(), 100);
-    tg.close();
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData.entries());
+    if (tg && tg.sendData) {
+        try {
+            tg.sendData(JSON.stringify(data));
+            console.log("Данные отправлены в бота:", data);
+        } catch (error) {
+            console.error("Ошибка отправки данных:", error);
+            alert("Ошибка отправки формы. Сообщите администратору.");
+        }
+        tg.close();
+    } else {
+        console.error("Telegram WebApp API не доступен.");
+        alert("Ошибка связи с Telegram. Попробуйте позже.");
+    }
   });
 </script>
 </body>
+
 </html>
